@@ -1,0 +1,12 @@
+<program> --> begin <statement list> end
+<statement list> --> <if statement> ; <statement list>
+<statement list> --> <if statement>
+<statement list> --> <statement> ; <statement list>
+<statement list> --> <statement>
+<if statement> --> if (<boolean expression>) { <statement list>}
+<statement> --> <id> := <expression>
+<expression> --> <id> + <id>
+<expression> --> <id> - <id>
+<expression> --> <id>
+<boolean expression> --> <id> = <id>
+<boolean expression> --> <id> != <id>

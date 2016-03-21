@@ -41,6 +41,7 @@ public class Syner {
 	}
 	
 	public void parseStatement() throws IOException {
+		
 		if (lex.token == lex.IDENT) {
 			String var = lex.idName;
 			lex.getNextToken(); 
@@ -54,7 +55,56 @@ public class Syner {
 			} else {
 				errorMessage("assignment symbol expected");
 			}
-		} else {
+		}
+		//Added for SEG2106 A3
+		//Should check for the if statements
+		else if(lex.token == lex.IF)
+		{
+			lex.getNextToken();
+			//Find the beginning of the boolean expression
+			if(lex.token == lex.LEFT_BRACE)
+			{
+				lex.getNextToken();
+				boolean v = parseBooleanExpression();
+				
+				//This should be the end of the boolean expression
+				if(lex.token == lex.RIGHT_BRACE)
+				{
+					if(v == true)
+					{
+						//Execute the statement list inside
+						lex.getNextToken();
+						if(lex.token == lex.LEFT_CURLY)
+						{
+							lex.getNextToken();
+							parseStatement();
+							
+							if(lex.token == lex.RIGHT_CURLY)
+								lex.getNextToken();
+							else
+								errorMessage("} expected at the end of a statement");
+						}
+					}
+					else
+					{
+						//Look for first '}'
+						try {
+							lex.skipToEndOfIfStatement();
+							lex.getNextToken();
+						} catch (EndOfFileEncounteredException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}
+				else
+				{
+					errorMessage(") expected at the end of a statement");
+				}
+				
+			}
+		}
+		else {
 			errorMessage("identifier expected at the begining of a statement");
 		}
 	}
@@ -62,6 +112,8 @@ public class Syner {
 	public int parseExpression() throws IOException {
 		if(lex.token == lex.IDENT) {
 			int value = ((Integer)symbolTable.get(lex.idName)).intValue();
+			String var1 = lex.idName + "";
+
 			lex.getNextToken();
 			
 			//Since we only removing the MINUS operator
@@ -72,10 +124,11 @@ public class Syner {
 				lex.getNextToken();
 				if(lex.token == lex.IDENT) {					
 					int tmp = ((Integer)symbolTable.get(lex.idName)).intValue();
+					String var2 = lex.idName + "";
 					
 					value = value + tmp;
 //					value = (opIsPlus)? (value + tmp) : (value - tmp) ; 
-					
+										
 					lex.getNextToken();
 					return(value); }
 				else {errorMessage("identifier expected at the end of the expression");
@@ -85,6 +138,40 @@ public class Syner {
 		}
 		else {errorMessage("identifier expected at the beginning of a expression");
 		return(0);}
+	}
+	
+	//Added in for SEG2106
+	public boolean parseBooleanExpression() throws IOException
+	{
+		//Should not execute unless we know the boolean expression is satisfied
+		boolean result = false;
+		
+		if(lex.token == lex.IDENT) {
+			int value = ((Integer)symbolTable.get(lex.idName)).intValue();
+			lex.getNextToken();
+
+			
+			if(lex.token==lex.EQUAL || lex.token==lex.UNEQUAL){
+				
+				boolean opIsEqual = lex.token==lex.EQUAL;
+				
+				lex.getNextToken();
+				if(lex.token == lex.IDENT) {	
+					
+					int tmp = ((Integer)symbolTable.get(lex.idName)).intValue();
+					lex.getNextToken();
+					
+					result = (opIsEqual) ? value==tmp : value != tmp;
+					
+					return(result); 
+					}
+				else {errorMessage("identifier expected at the end of the expression");
+				return(result);}
+			}
+			else {return(result);}
+		}
+		else {errorMessage("identifier expected at the beginning of a expression");
+		return(result);}
 	}
 
 	public void errorMessage(String s) throws IOException {
