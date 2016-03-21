@@ -1,0 +1,6 @@
+BEGIN Var1 := ten;
+Var2 := one ; 
+Var3 := ten - one;
+Var4 := Var1 + ten;
+Var3 := Var3 + Var2
+END  hjk 
