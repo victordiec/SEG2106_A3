@@ -16,14 +16,22 @@ public class Syner {
 	}
 
 	public void startAnalysis() throws IOException {
-		lex.start(); //start lexical analyser to get a token
-		parseProgram(); //call parseProgram() to process the analysis
-		//after "END" token, there should be the EOF token
-		if(lex.token == lex.EOF) {System.out.println("\n"+"analysis complete, no syntax error");}
-		else {errorMessage("after END - more tokens before EOF");}			
+		try
+		{
+			lex.start(); //start lexical analyser to get a token
+			parseProgram(); //call parseProgram() to process the analysis
+			//after "END" token, there should be the EOF token
+			if(lex.token == lex.EOF) {System.out.println("\n"+"analysis complete, no syntax error");}
+			else {errorMessage("after END - more tokens before EOF");}			
+		}
+		catch(UndefinedVariableException e)
+		{
+			System.out.println("Could not finish compilation because:" + e.getMessage());
+		}
 	}
 
-	public void parseProgram() throws IOException {
+	public void parseProgram() throws IOException, UndefinedVariableException {
+
 		if(lex.token == lex.BEGIN){
 			while (true){
 				lex.getNextToken();
@@ -37,10 +45,10 @@ public class Syner {
 		}
 		else {
 			errorMessage("BEGIN token expected!");
-		}
+		}		
 	}
 	
-	public void parseStatement() throws IOException {
+	public void parseStatement() throws IOException, UndefinedVariableException {
 		
 		if (lex.token == lex.IDENT) {
 			String var = lex.idName;
@@ -109,8 +117,15 @@ public class Syner {
 		}
 	}
 	
-	public int parseExpression() throws IOException {
+	public int parseExpression() throws IOException, UndefinedVariableException{
 		if(lex.token == lex.IDENT) {
+			
+			if(symbolTable.get(lex.idName) == null)
+			{
+				System.out.println("\nSyntax Error:\t" + lex.idName + " has not been defined");
+				throw new UndefinedVariableException(lex.idName + " has not been defined");
+			}
+			
 			int value = ((Integer)symbolTable.get(lex.idName)).intValue();
 			String var1 = lex.idName + "";
 
@@ -122,7 +137,14 @@ public class Syner {
 			if(lex.token==lex.PLUS){
 				
 				lex.getNextToken();
-				if(lex.token == lex.IDENT) {					
+				if(lex.token == lex.IDENT) {
+					
+					if(symbolTable.get(lex.idName) == null)
+					{
+						System.out.println("\nSyntax Error:\t" + lex.idName + " has not been defined");
+						throw new UndefinedVariableException(lex.idName + " has not been defined");
+					}
+					
 					int tmp = ((Integer)symbolTable.get(lex.idName)).intValue();
 					String var2 = lex.idName + "";
 					
@@ -141,12 +163,19 @@ public class Syner {
 	}
 	
 	//Added in for SEG2106
-	public boolean parseBooleanExpression() throws IOException
+	public boolean parseBooleanExpression() throws IOException, UndefinedVariableException
 	{
 		//Should not execute unless we know the boolean expression is satisfied
 		boolean result = false;
 		
 		if(lex.token == lex.IDENT) {
+			
+			if(symbolTable.get(lex.idName) == null)
+			{
+				System.out.println("\nSyntax Error:\t" + lex.idName + " has not been defined");
+				throw new UndefinedVariableException(lex.idName + " has not been defined");
+			}
+			
 			int value = ((Integer)symbolTable.get(lex.idName)).intValue();
 			lex.getNextToken();
 
@@ -157,6 +186,12 @@ public class Syner {
 				
 				lex.getNextToken();
 				if(lex.token == lex.IDENT) {	
+					
+					if(symbolTable.get(lex.idName) == null)
+					{
+						System.out.println("\nSyntax Error:\t" + lex.idName + " has not been defined");
+						throw new UndefinedVariableException(lex.idName + " has not been defined");
+					}
 					
 					int tmp = ((Integer)symbolTable.get(lex.idName)).intValue();
 					lex.getNextToken();

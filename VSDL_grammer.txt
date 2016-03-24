@@ -1,12 +1,60 @@
+//Original
 <program> --> begin <statement list> end
-<statement list> --> <if statement> ; <statement list>
-<statement list> --> <if statement>
 <statement list> --> <statement> ; <statement list>
 <statement list> --> <statement>
-<if statement> --> if (<boolean expression>) { <statement list>}
 <statement> --> <id> := <expression>
 <expression> --> <id> + <id>
 <expression> --> <id> - <id>
 <expression> --> <id>
-<boolean expression> --> <id> = <id>
-<boolean expression> --> <id> != <id>
+
+//Left factoring
+<program> --> begin <statement list> end
+<statement list> --> <statement><S>
+<S> -- >  ; <statement list>
+<S> -- > epsilon
+<statement> --> <id> := <expression>
+<expression> --> <id><E>
+<E> --> + <id>
+<E> --> - <id>
+<E> --> epsilon
+
+//For Assignment 3 (I think this is LL 1)
+
+<program> --> begin <statement list> end
+<statement list> --> <if statement><S>
+<statement list> --> <statement><S>
+<S> -- >  ; <statement list>
+<S> -- > epsilon
+<if statement> --> if (<boolean expression>) { <statement list>}
+<statement> --> <id> := <expression>
+<expression> --> <id><E>
+<E> --> + <id>
+<E> --> - <id>
+<E> --> epsilon
+<boolean expression> --> <id><B>
+<B> -- >  = <id>
+<B> -- >  != <id>
+
+FIRST(Program) = {begin}
+FIRST(statement list) = {if, id}
+First(S) = {;, epsilon}
+First(if statement) = {if}
+First(statement) = {id}
+First(expression) = {id}
+First(E) = {+,-,epsilon}
+First(boolean expression) = {id}
+First(B) = {=, !=}
+
+FOLLOW(Program) = {$}
+FOLLOW(statement list) = {end, '}'}
+FOLLOW(S) = {end, '}'}
+FOLLOW(if statement) = {;, end,'}'}
+FOLLOW(statement) = {;, end,'}'}
+FOLLOW(expression) = {end,;,'}'}
+FOLLOW(E) = {end,;,'}'}
+FOLLOW(boolean expression) = {')'}
+FOLLOW(B) = {')'}
+
+//parsing table
+https://docs.google.com/a/uottawa.ca/spreadsheets/d/19BYVeBc4kje_odpSDKb0aIE5vAjCu6O6dFz2dg0AIkc/edit?usp=sharing
+
