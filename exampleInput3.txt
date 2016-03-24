@@ -1,0 +1,4 @@
+BEGIN Var1 := ten;
+Var2 := Var1;
+Var3 := Var4;
+END  hjk 
