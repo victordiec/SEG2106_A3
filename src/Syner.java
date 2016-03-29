@@ -68,65 +68,65 @@ public class Syner {
 		//Should check for the if statements
 		else if(lex.token == lex.IF)
 		{
-			lex.getNextToken();
-			//Find the beginning of the boolean expression
-			if(lex.token == lex.LEFT_BRACE)
-			{
-				lex.getNextToken();
-				boolean v = parseBooleanExpression();
-				
-				//This should be the end of the boolean expression
-				if(lex.token == lex.RIGHT_BRACE)
-				{
-					if(v == true)
-					{
-						//Execute the statement list inside
-						lex.getNextToken();
-						if(lex.token == lex.LEFT_CURLY)
-						{
-							lex.getNextToken();
-							parseStatement();
-							
-							if(lex.token == lex.RIGHT_CURLY)
-								lex.getNextToken();
-							else
-								errorMessage("} expected at the end of a statement");
-						}
-					}
-					else
-					{
-						//Look for first '}'
-						try {
-							lex.skipToEndOfIfStatement();
-							lex.getNextToken();
-						} catch (EndOfFileEncounteredException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-				}
-				else
-				{
-					errorMessage(") expected at the end of a statement");
-				}
-				
-			}
+			parseIfStatement();
 		}
 		else {
 			errorMessage("identifier expected at the begining of a statement");
 		}
 	}
 	
+	public void parseIfStatement() throws IOException, UndefinedVariableException{
+		
+		lex.getNextToken();
+		//Find the beginning of the boolean expression
+		if(lex.token == lex.LEFT_BRACE)
+		{
+			lex.getNextToken();
+			boolean v = parseBooleanExpression();
+			
+			//This should be the end of the boolean expression
+			if(lex.token == lex.RIGHT_BRACE)
+			{
+				if(v == true)
+				{
+					//Execute the statement list inside
+					lex.getNextToken();
+					if(lex.token == lex.LEFT_CURLY)
+					{
+						lex.getNextToken();
+						parseStatement();
+						
+						lex.getNextToken();
+						if(lex.token == lex.RIGHT_CURLY)
+							lex.getNextToken();
+						else
+							errorMessage("} expected at the end of a statement");
+					}
+				}
+				else
+				{
+					//Look for first '}'
+					try {
+						lex.skipToEndOfIfStatement();
+						lex.getNextToken();
+					} catch (EndOfFileEncounteredException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+			else
+			{
+				errorMessage(") expected at the end of a statement");
+			}
+			
+		}
+	}
+	
 	public int parseExpression() throws IOException, UndefinedVariableException{
 		if(lex.token == lex.IDENT) {
 			
-			if(symbolTable.get(lex.idName) == null)
-			{
-				System.out.println("\nSyntax Error:\t" + lex.idName + " has not been defined");
-				throw new UndefinedVariableException(lex.idName + " has not been defined");
-			}
-			
-			int value = ((Integer)symbolTable.get(lex.idName)).intValue();
+			int value =  getVariableValue(lex.idName);
 			String var1 = lex.idName + "";
 
 			lex.getNextToken();
@@ -139,13 +139,7 @@ public class Syner {
 				lex.getNextToken();
 				if(lex.token == lex.IDENT) {
 					
-					if(symbolTable.get(lex.idName) == null)
-					{
-						System.out.println("\nSyntax Error:\t" + lex.idName + " has not been defined");
-						throw new UndefinedVariableException(lex.idName + " has not been defined");
-					}
-					
-					int tmp = ((Integer)symbolTable.get(lex.idName)).intValue();
+					int tmp = getVariableValue(lex.idName);
 					String var2 = lex.idName + "";
 					
 					value = value + tmp;
@@ -170,13 +164,7 @@ public class Syner {
 		
 		if(lex.token == lex.IDENT) {
 			
-			if(symbolTable.get(lex.idName) == null)
-			{
-				System.out.println("\nSyntax Error:\t" + lex.idName + " has not been defined");
-				throw new UndefinedVariableException(lex.idName + " has not been defined");
-			}
-			
-			int value = ((Integer)symbolTable.get(lex.idName)).intValue();
+			int value = getVariableValue(lex.idName);
 			lex.getNextToken();
 
 			
@@ -187,13 +175,9 @@ public class Syner {
 				lex.getNextToken();
 				if(lex.token == lex.IDENT) {	
 					
-					if(symbolTable.get(lex.idName) == null)
-					{
-						System.out.println("\nSyntax Error:\t" + lex.idName + " has not been defined");
-						throw new UndefinedVariableException(lex.idName + " has not been defined");
-					}
+					// Check for valid id name
+					int tmp = getVariableValue(lex.idName);
 					
-					int tmp = ((Integer)symbolTable.get(lex.idName)).intValue();
 					lex.getNextToken();
 					
 					result = (opIsEqual) ? value==tmp : value != tmp;
@@ -207,6 +191,19 @@ public class Syner {
 		}
 		else {errorMessage("identifier expected at the beginning of a expression");
 		return(result);}
+	}
+	
+	public int getVariableValue(String varName) throws UndefinedVariableException{
+		
+		// Check for valid id name if not throw Exception
+		if(symbolTable.get(lex.idName) == null)
+		{
+			System.out.println("\nSyntax Error:\t" + lex.idName + " has not been defined");
+			throw new UndefinedVariableException(lex.idName + " has not been defined");
+		}
+		
+		// Fetch variable value from symbol table and return
+		return (((Integer)symbolTable.get(lex.idName)).intValue());
 	}
 
 	public void errorMessage(String s) throws IOException {
