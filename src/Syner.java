@@ -35,7 +35,7 @@ public class Syner {
 		if(lex.token == lex.BEGIN){
 			while (true){
 				lex.getNextToken();
-				parseStatement();
+				parseStatement(false);
 				if(lex.token != lex.SEMICOLON){
 					break;
 				}
@@ -48,7 +48,72 @@ public class Syner {
 		}		
 	}
 	
-	public void parseStatement() throws IOException, UndefinedVariableException {
+	public void parseIfStatement(boolean execute) throws IOException, UndefinedVariableException
+	{
+		
+		boolean evaluate;
+		
+		lex.getNextToken();
+		//Find the beginning of the boolean expression
+		if(lex.token == lex.LEFT_BRACE)
+		{
+			lex.getNextToken();
+			boolean v = parseBooleanExpression();
+			
+			evaluate = v && execute;
+			
+			//This should be the end of the boolean expression
+			if(lex.token == lex.RIGHT_BRACE)
+			{
+				
+				//Rather than checking if the condition is true to execute statements, we continue
+				//analyzing the code for proper syntax and only execute if need be
+				
+//				if(v == true)
+//				{
+					//Execute the statement list inside
+					lex.getNextToken();
+					if(lex.token == lex.LEFT_CURLY)
+					{
+						
+						//WE HAVE TO CHECK HERE IN ORDER TO DETERMINE IF THERE IS A POSSIBILITY OF A NESTED IF STATEMENT OR NOT
+						lex.getNextToken();
+						parseStatement(evaluate);
+						
+						if(lex.token == lex.RIGHT_CURLY)
+							lex.getNextToken();
+						else
+							errorMessage("} expected at the end of a statement");
+					}
+//				}
+//				else
+//				{
+//					//Look for first '}'
+//					try {
+//						lex.skipToEndOfIfStatement();
+//						lex.getNextToken();
+//					} catch (EndOfFileEncounteredException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//				}
+			}
+			else
+			{
+				errorMessage(") expected at the end of a statement");
+			}
+			
+		}
+		else
+		{
+			errorMessage("( expected at the end of a statement");
+		}
+		
+	}
+	
+	
+	
+	public void parseStatement(boolean execute) throws IOException, UndefinedVariableException {
 		
 		if (lex.token == lex.IDENT) {
 			String var = lex.idName;
@@ -58,8 +123,13 @@ public class Syner {
 				int v = parseExpression();
 				
 				//Save the variable and its associated value into the table
-				symbolTable.put(var, new Integer(v) );
-				System.out.println("\n"+var+" assign "+v);
+				
+				if(execute)
+				{
+					symbolTable.put(var, new Integer(v));
+					System.out.println("\n"+var+" assign "+v);
+				}
+				
 			} else {
 				errorMessage("assignment symbol expected");
 			}
@@ -110,6 +180,10 @@ public class Syner {
 					errorMessage(") expected at the end of a statement");
 				}
 				
+			}
+			else
+			{
+				errorMessage("( expected at the end of a statement");
 			}
 		}
 		else {
