@@ -203,7 +203,8 @@ public class Syner {
 				else {errorMessage("identifier expected at the end of the expression");
 				return(result);}
 			}
-			else {return(result);}
+			else {errorMessage("Either \'=\' or \'!=\' expected to complete the boolean expression");
+				return(result);}
 		}
 		else {errorMessage("identifier expected at the beginning of a expression");
 		return(result);}

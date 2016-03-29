@@ -58,3 +58,22 @@ FOLLOW(B) = {')'}
 //parsing table
 https://docs.google.com/a/uottawa.ca/spreadsheets/d/19BYVeBc4kje_odpSDKb0aIE5vAjCu6O6dFz2dg0AIkc/edit?usp=sharing
 
+Implementation is wrong
+
+Semantic Evaluation, ALL CODE SHOULD BE EVALUATED ANALYZED BY THE COMPILER
+We aren't just checking it at runtime
+
+What should happen is that the parse statement should be passed a variable of true or false which it inherits from
+parseIfStatement<if statement> and depending on whether the answer is true or not, the compiler should evaluate based
+off of this inherited value whether the <statement list> or statement should be evaluated
+
+
+
+
+
+
+
+
+
+
+
