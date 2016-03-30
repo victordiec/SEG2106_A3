@@ -8,7 +8,7 @@ public class Main {
 	public static void main (String args[]) throws IOException, EndOfFileEncounteredException{
 		if(args.length != 1) {
 			System.out.println("default input is from file exampleInput.txt");
-			inputFile = "exampleInput2.txt";} else {inputFile = args[0];}
+			inputFile = "exampleInput4.txt";} else {inputFile = args[0];}
 		syn = new Syner(inputFile);
 		syn.startAnalysis();
 	}

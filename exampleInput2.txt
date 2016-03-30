@@ -9,5 +9,5 @@ Var3 := Var3 + Var2;
 if(Var2=one){if (Var2 = one) {Var3 := ten + one; Var4 := one + ten}};
 
 if(Var2=one){if (Var1 = one) {Var3 := ten + one; Var4 := one + ten}; Var2 := one };
-
+if(Var1=one){if (Var2 = one) {Var3 := ten + one; Var4 := one + ten}; Var2 := one }
 END  hjk 

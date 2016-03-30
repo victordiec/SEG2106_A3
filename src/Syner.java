@@ -33,7 +33,6 @@ public class Syner {
 	}
 
 	public void parseProgram() throws IOException, UndefinedVariableException {
-
 		if(lex.token == lex.BEGIN){
 			while (true){
 				lex.getNextToken();
@@ -51,7 +50,6 @@ public class Syner {
 	}
 
 	public void parseStatement(boolean execute) throws IOException, UndefinedVariableException {
-
 		if (lex.token == lex.IDENT) {
 			String var = lex.idName;
 			lex.getNextToken(); 
@@ -60,16 +58,11 @@ public class Syner {
 				int v = parseExpression();
 
 				//Save the variable and its associated value into the table
-
-				if(execute)
-				{
+				if(execute){
 					symbolTable.put(var, new Integer(v));
 					System.out.println("\n"+var+" assign "+v);
 				}
-
-			} else {
-				errorMessage("assignment symbol expected");
-			}
+			} else {errorMessage("assignment symbol expected");}
 		}
 		//Added for SEG2106 A3
 		//Should check for the if statements
@@ -77,10 +70,9 @@ public class Syner {
 		{
 			boolean evaluate;
 			lex.getNextToken();
-			
+
 			//Find the beginning of the boolean expression
-			if(lex.token == lex.LEFT_BRACE)
-			{
+			if(lex.token == lex.LEFT_BRACE) {
 				lex.getNextToken();
 				boolean v = parseBooleanExpression();
 
@@ -89,39 +81,28 @@ public class Syner {
 				//This should be the end of the boolean expression
 				if(lex.token == lex.RIGHT_BRACE)
 				{
-
 					lex.getNextToken();
 					if(lex.token == lex.LEFT_CURLY)
 					{
 						while (true){
 							lex.getNextToken();
 							parseStatement(evaluate);
-							
+
 							if(lex.token != lex.SEMICOLON){
 								break;
 							}
 						}
-
 						if(lex.token == lex.RIGHT_CURLY)
 							lex.getNextToken();
 						else
 							errorMessage("} expected at the end of a statement");
 					}
 				}
-				else
-				{
-					errorMessage(") expected at the end of a statement");
-				}
-
+				else{errorMessage(") expected at the end of a statement");}
 			}
-			else
-			{
-				errorMessage("( expected at the end of a statement");
-			}
+			else{errorMessage("( expected at the end of a statement");}
 		}
-		else {
-			errorMessage("identifier or if expected at the begining of a statement");
-		}
+		else {errorMessage("identifier or if expected at the begining of a statement");}
 	}
 
 	public int parseExpression() throws IOException, UndefinedVariableException{
@@ -192,7 +173,7 @@ public class Syner {
 		else {errorMessage("identifier expected at the beginning of a expression");
 		return(result);}
 	}
-	
+
 
 	public int getVariableValue(String varName) throws UndefinedVariableException{
 
